@@ -21,20 +21,17 @@ CHANNELS = 1
 RATE = 44100
 
 Q = queue.Queue()
-E = threading.Event()
 data = []
 window = signal.hamming(1024)
 
 
 def audio_callback(in_data, frame_count, time_info, status):
     Q.put(in_data)
-    E.set()
     return (None,pyaudio.paContinue)
 
 def audio_read(stream):
 	global data
 	global Q
-	E.wait(timeout=1000)
 	while stream.is_active():
 		if Q.empty():
 			time.sleep(0.05)
