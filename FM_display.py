@@ -18,13 +18,13 @@ plot = plt.plot
 fft = fftpack.fft
 pi = np.pi
 
-N = 1024
+N = 4*1024
 data = np.arange(0,N,1)
 
 # plot the spectra
 
 fig = plt.figure()
-ax = plt.axes(xlim=(0,1024),ylim=(-1,20))#
+ax = plt.axes(xlim=(0,1024),ylim=(-100,0))#
 line, = ax.plot([], [], lw=2)
 
 def init():
@@ -45,7 +45,7 @@ Q = queue.Queue()
 sdr = RtlSdr()
 window = signal.hamming(N)
 
-
+'''
 def data_processing():
 	global Q
 	global data
@@ -56,7 +56,22 @@ def data_processing():
 			Q.get()
 		origin_data = origin_data*window
 		data = abs(fftpack.fft(origin_data.real))
-		print(Q.qsize())
+#		print(Q.qsize())
+'''
+
+def data_processing():
+	global Q
+	global data
+	global window
+	while  1:
+		origin_data = Q.get()
+		while not Q.empty():
+			Q.get()
+		window_data = origin_data*window
+		ob_data = abs(fftpack.fft(window_data))
+		data = 20*lg(ob_data/N)
+		
+
 
 
 

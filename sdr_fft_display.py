@@ -98,12 +98,12 @@ def read_data_thread(q,ad_rdy_ev):
             #rt_data = np.frombuffer(data,np.dtype('<i2'))
             data = data * window
             fft_temp_data=fftpack.fftshift(fftpack.fft(data,overwrite_x=True))
-            fft_data=np.abs(fft_temp_data)[0:fft_temp_data.size]
+            fft_data=np.abs(fft_temp_data)#[0:fft_temp_data.size]
             #if Recording :
                 #frames.append(data)
         ad_rdy_ev.clear()
+        print(fft_data.size)
         time.sleep(0.5)
-        print(q.qsize())
 
 #@limit_calls(3)
 def rtlsdr_callback(samples, rtlsdr_obj):
