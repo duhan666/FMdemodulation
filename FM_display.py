@@ -24,7 +24,7 @@ data = np.arange(0,N,1)
 # plot the spectra
 
 fig = plt.figure()
-ax = plt.axes(xlim=(0,1024),ylim=(-100,0))#
+ax = plt.axes(xlim=(0,N),ylim=(-60,0))#
 line, = ax.plot([], [], lw=2)
 
 def init():
@@ -45,35 +45,19 @@ Q = queue.Queue()
 sdr = RtlSdr()
 window = signal.hamming(N)
 
-'''
 def data_processing():
 	global Q
 	global data
 	global window
-	while 1:
-		origin_data = Q.get()
-		while not Q.empty():
-			Q.get()
-		origin_data = origin_data*window
-		data = abs(fftpack.fft(origin_data.real))
-#		print(Q.qsize())
-'''
-
-def data_processing():
-	global Q
-	global data
-	global window
+	
 	while  1:
 		origin_data = Q.get()
 		while not Q.empty():
 			Q.get()
 		window_data = origin_data*window
 		ob_data = abs(fftpack.fft(window_data))
+		#sdata=fftpack.fftshift(fftpack.fft(ob_data,overwrite_x=True))
 		data = 20*lg(ob_data/N)
-		
-
-
-
 
 def rtlsdr_callback(samples, rtlsdr_obj):
     global Q
@@ -82,7 +66,7 @@ def rtlsdr_callback(samples, rtlsdr_obj):
 def rtlsdr_main():
 	print('Config RTLSDR parameters')
 	sdr.rs = 1e6
-	sdr.fc = 101.8e6
+	sdr.fc = 105.6e6
 	sdr.gain = 50
 	print('  sample rate: %0.6f MHz' % (sdr.rs/1e6))
 	print('  center frequency %0.6f MHz' % (sdr.fc/1e6))
