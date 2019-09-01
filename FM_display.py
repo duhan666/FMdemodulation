@@ -54,24 +54,12 @@ def data_processing():
 		origin_data = Q.get()
 		while not Q.empty():
 			Q.get()
-		window_data = origin_data*window
+		window_data = origin_data
 		ob_data = abs(fftpack.fft(window_data))
 		#sdata=fftpack.fftshift(fftpack.fft(ob_data,overwrite_x=True))
 		data = 20*lg(ob_data/N)
 
-def rtlsdr_callback(samples, rtlsdr_obj):
-    global Q
-    Q.put(samples)
 
-def rtlsdr_main():
-	print('Config RTLSDR parameters')
-	sdr.rs = 1e6
-	sdr.fc = 105.6e6
-	sdr.gain = 50
-	print('  sample rate: %0.6f MHz' % (sdr.rs/1e6))
-	print('  center frequency %0.6f MHz' % (sdr.fc/1e6))
-	print('  gain: %d dB' % sdr.gain)
-	sdr.read_samples_async(rtlsdr_callback, N)
 
 t1 = threading.Thread(target = data_processing)
 t2 = threading.Thread(target = rtlsdr_main)

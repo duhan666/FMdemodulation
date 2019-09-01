@@ -16,7 +16,7 @@ from rtlsdr import *
 import pyaudio
 
 RFRATE = 0.25e6
-RFFREQ = 103.5e6
+RFFREQ = 101.1e6
 RFGAIN = 50
 
 DOWN_FACTOR = 10
@@ -60,20 +60,20 @@ def read_data_thread(rf_q,ad_rdy_ev,audio_q):
 
 
             #demod method 2
-            data_delay=np.insert(data,0,pre_data)
-            pre_data = data_delay[-1]
-            data_delay=np.delete(data_delay,-1)
-            diff_data=data*np.conj(data_delay)
-            audiodata=np.angle(diff_data)
-            audiodata=np.unwrap(audiodata)
+            #data_delay=np.insert(data,0,pre_data)
+            #pre_data = data_delay[-1]
+            #data_delay=np.delete(data_delay,-1)
+            #diff_data=data*np.conj(data_delay)
+            #audiodata=np.angle(diff_data)
+            #audiodata=np.unwrap(audiodata)
 
 
             #demod method 3
-            #diff_data=np.diff(data)
-            #diff_data=np.insert(diff_data,0,data[0]-pre_data)
-            #pre_data=data[-1]
-            #audiodata=data.real*diff_data.imag-data.imag*diff_data.real
-            #audiodata=audiodata/(np.power(data.real,2)+np.power(data.imag,2))
+            diff_data=np.diff(data)
+            diff_data=np.insert(diff_data,0,data[0]-pre_data)
+            pre_data=data[-1]
+            audiodata=data.real*diff_data.imag-data.imag*diff_data.real
+            audiodata=audiodata/(np.power(data.real,2)+np.power(data.imag,2))
 
             #demod method 4
             #data = data*10000
@@ -90,12 +90,12 @@ def read_data_thread(rf_q,ad_rdy_ev,audio_q):
             #audiodata=audiodata*1
 
             #audiodata=signal.decimate(audiodata,DOWN_FACTOR,ftype="fir")
-            audiodata = audiodata[0::10]
+            audiodata = audiodata[0::DOWN_FACTOR]
 
             #audiodata = signal.lfilter(FIR_LP,1.0,audiodata)
-            audiodata = signal.fftconvolve(FIR_LP, audiodata)
+            #audiodata = signal.fftconvolve(FIR_LP, audiodata)
 
-            audiodata_amp=audiodata*1e4
+            audiodata_amp=audiodata*5e3
             snd_data = audiodata_amp.astype(np.dtype('<i2')).tostring()
             audio_q.put(snd_data)
         ad_rdy_ev.clear()
