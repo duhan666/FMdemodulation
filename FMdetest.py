@@ -18,22 +18,23 @@ N = 5120
 fc = 0
 fi = 44e3
 fs = fi*1280
-index = 40000
+index = 2
 j = np.complex(0,1)
 
 n = np.arange(N)
 t = n/fs
+t1 = n[0::Down_factor]
 inSig = cos(2*pi*fi*t)#+cos(3*pi*fi*t)
 x = cos(2*pi*fc*t+index*inSig)+j*sin(2*pi*fc*t+index*inSig)
 xdecimate = signal.decimate(x,Down_factor,ftype="fir")
-xangle = np.angle(x)
+xangle = np.angle(xdecimate)
 xdata = np.gradient(xangle)
 xdata = np.unwrap(xdata)
 
 plt.subplot(4,1,1)
 #plt.ylim(-0.02,0.02)
 #plt.xlim(0,0.0002)
-plot(t,xdata)
+plot(t1,xdata)
 plt.subplot(4,1,2)
 plot(x.real)
 plt.subplot(4,1,3)
